@@ -5,11 +5,19 @@
 </template>
 
 <script>
-  export default {
-    name: 'notewhat',
-  }
+export default {
+  name: 'notewhat',
+}
 </script>
 
 <style>
-  /* CSS */
+/* CSS */
+
+#app {
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+}
 </style>
