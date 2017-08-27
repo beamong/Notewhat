@@ -8,8 +8,8 @@
         <div class="editor">
           <codemirror :code="code" :options="editorOptions" @ready="onEditorReady" @change="onEditorCodeChange"></codemirror>
         </div>
-        <div style="font-size: 13px">Key buffer:
-          <span style="">{{keyBuffer}}</span>
+        <div v-if="keyBuffer" class="keybuffer-placeholder">
+          Key buffer: <span style="">{{keyBuffer}}</span>
         </div>
       </main>
 
@@ -30,6 +30,7 @@ import marked from 'marked'
 import { codemirror, CodeMirror } from 'vue-codemirror-electron'
 import fs from 'fs'
 import 'codemirror/lib/codemirror.css'
+import 'codemirror/addon/dialog/dialog.css'
 import 'codemirror/keymap/vim'
 
 import SystemInformation from './LandingPage/SystemInformation'
@@ -57,8 +58,8 @@ export default {
         const content = editor.getValue().trim()
         console.log(content)
       }
-      CodeMirror.Vim.defineMotion('quit', this.closeEditor)
-      CodeMirror.Vim.mapCommand('ZQ', 'motion', 'quit')
+      // CodeMirror.Vim.defineMotion('quit', this.closeEditor)
+      // CodeMirror.Vim.mapCommand('ZQ', 'motion', 'quit')
     },
     onEditorCodeChange(code) {
       this.codeChange(this, code)
@@ -101,12 +102,12 @@ body {
 }
 
 .editor {
-  height: 96%;
+  height: 100%;
 }
 
 .CodeMirror,
 .CodeMirror-scroll {
-  height: 92%;
+  height: 100%;
   max-width: 500px;
 }
 
@@ -123,6 +124,13 @@ body {
 
 .holygrail-content {
   flex: 1;
+  position: relative;
+  .keybuffer-placeholder {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    font-size: 13px
+  }
 }
 
 .holygrail-nav {
