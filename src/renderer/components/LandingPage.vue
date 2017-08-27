@@ -5,7 +5,12 @@
     </header>
     <div class="holygrail-body">
       <main class="holygrail-content">
-        <codemirror :code="code" :options="editorOptions" @change="onEditorCodeChange"></codemirror>
+        <div class="editor">
+          <codemirror :code="code" :options="editorOptions" @ready="onEditorReady" @change="onEditorCodeChange"></codemirror>
+        </div>
+        <div style="font-size: 13px">Key buffer:
+          <span style="">{{keyBuffer}}</span>
+        </div>
       </main>
 
       <nav class="holygrail-nav">
@@ -22,8 +27,9 @@
 <script>
 import _ from 'lodash'
 import marked from 'marked'
-import { codemirror } from 'vue-codemirror-electron'
+import { codemirror, CodeMirror } from 'vue-codemirror-electron'
 import fs from 'fs'
+import 'codemirror/lib/codemirror.css'
 import 'codemirror/keymap/vim'
 
 import SystemInformation from './LandingPage/SystemInformation'
@@ -40,6 +46,20 @@ export default {
     open(link) {
       this.$electron.shell.openExternal(link)
     },
+    onEditorReady(editor) {
+      CodeMirror.on(editor, 'vim-keypress', (key) => {
+        this.keyBuffer = `${this.keyBuffer}${key}`
+      })
+      CodeMirror.on(editor, 'vim-command-done', (/* e */) => {
+        this.keyBuffer = ''
+      })
+      editor.save = () => {
+        const content = editor.getValue().trim()
+        console.log(content)
+      }
+      CodeMirror.Vim.defineMotion('quit', this.closeEditor)
+      CodeMirror.Vim.mapCommand('ZQ', 'motion', 'quit')
+    },
     onEditorCodeChange(code) {
       this.codeChange(this, code)
     },
@@ -50,34 +70,24 @@ export default {
   data() {
     return {
       transpiled: '',
+      keyBuffer: '',
       code: sample,
       editorOptions: {
-        // codemirror options
         tabSize: 4,
         mode: 'text/x-markdown',
-        // theme: 'base16-dark',
         lineNumbers: true,
         line: true,
-        // sublime、emacs、vim三种键位模式，支持你的不同操作习惯
-        // keyMap: 'sublime',
         keyMap: 'vim',
-        // 按键映射，比如Ctrl键映射autocomplete，autocomplete是hint代码提示事件
-        // extraKeys: { "Ctrl": "autocomplete" },
-        // 代码折叠
         foldGutter: true,
-        // gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
-        // 选中文本自动高亮，及高亮方式
         styleSelectedText: true,
         highlightSelectionMatches: { showToken: /\w/, annotateScrollbar: true },
-        // more codemirror config... 
-        // 如果有hint方面的配置，也应该出现在这里
       },
     }
   },
 }
 </script>
 
-<style>
+<style lang="scss">
 @import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro');
 
 * {
@@ -90,9 +100,13 @@ body {
   font-family: 'Source Sans Pro', sans-serif;
 }
 
+.editor {
+  height: 96%;
+}
+
 .CodeMirror,
 .CodeMirror-scroll {
-  height: 100%;
+  height: 92%;
   max-width: 500px;
 }
 
