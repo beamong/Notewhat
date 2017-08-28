@@ -57,7 +57,7 @@ import 'codemirror/keymap/vim'
 
 import SystemInformation from './LandingPage/SystemInformation'
 
-const sample = fs.readFileSync(`${__dirname}/sample.md`).toString()
+const sample = fs.readFileSync('./static/sample.md').toString()
 const sampleMenus = [{
   isActive: true,
   title: 'Roses are red Violets are blue',
