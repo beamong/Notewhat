@@ -3,7 +3,8 @@
     <div class="holygrail-header">
       <nav class="holygrail-nav">
         <span class="brand">
-          <span>NOTE</span><span class="sub">WHAT</span>
+          <span>NOTE</span>
+          <span class="sub">WHAT</span>
         </span>
       </nav>
       <nav class="holygrail-content">
@@ -19,10 +20,10 @@
     </div>
     <div class="holygrail-body">
       <nav class="holygrail-nav">
-        <div :class="menu.isActive ? 'active' : ''" :key="menu.id" v-for="menu in menus">
-          <h1>{{menu.title}}</h1>
+        <div :class="entry.isActive ? 'active' : ''" :key="entry.id" v-for="entry in entries">
+          <h1>{{entry.title}}</h1>
           <div class="content">
-            {{menu.content}}
+            {{entry.content}}
           </div>
         </div>
       </nav>
@@ -55,76 +56,26 @@ import 'codemirror/lib/codemirror.css'
 import 'codemirror/addon/dialog/dialog.css'
 import 'codemirror/keymap/vim'
 
+import store from '../store'
+
 import SystemInformation from './LandingPage/SystemInformation'
 
 const sample = fs.readFileSync('./static/sample.md').toString()
-const sampleMenus = [{
-  isActive: true,
-  title: 'Roses are red Violets are blue',
-  content: 'The next paragraph has the same phrases, but now they are separated by two spaces and a newline character:',
-}, {
-  isActive: false,
-  title: 'Roses are red',
-  content: 'Violets are blue',
-}, {
-  isActive: false,
-  title: 'Oh, and one thing I cannot stand is the mangling of words with multiple underscores in them like perform_complicated_task or do_this_and_do_that_and_another_thing.',
-  content: 'A bit of the GitHub spice',
-}, {
-  isActive: false,
-  title: 'A bit of the GitHub spice',
-  content: 'Violets are blue',
-}, {
-  isActive: false,
-  title: 'In addition to the changes in the previous section, certain references are auto-linked:',
-  content: 'SHA: be6a8cc1c1ecfe9489fb51e4869af15a13fc2cd2',
-}, {
-  isActive: false,
-  title: 'User@SHA ref: mojombo@be6a8cc1c1ecfe9489fb51e4869af15a13fc2cd',
-  content: 'User/Project@SHA: mojombo/god@be6a8cc1c1ecfe9489fb51e4869af15a13fc2cd2',
-}, {
-  isActive: false,
-  title: '#Num: #1',
-  content: 'User/#Num: mojombo#1',
-}, {
-  isActive: false,
-  title: 'User/Project#Num: mojombo/god#1',
-  content: 'These are dangerous goodies though, and we need to make sure email addresses don\'t get mangled:',
-}, {
-  isActive: false,
-  title: 'Roses are red',
-  content: 'Violets are blue',
-}, {
-  isActive: false,
-  title: 'Oh, and one thing I cannot stand is the mangling of words with multiple underscores in them like perform_complicated_task or do_this_and_do_that_and_another_thing.',
-  content: 'A bit of the GitHub spice',
-}, {
-  isActive: false,
-  title: 'A bit of the GitHub spice',
-  content: 'Violets are blue',
-}, {
-  isActive: false,
-  title: 'In addition to the changes in the previous section, certain references are auto-linked:',
-  content: 'SHA: be6a8cc1c1ecfe9489fb51e4869af15a13fc2cd2',
-}, {
-  isActive: false,
-  title: 'User@SHA ref: mojombo@be6a8cc1c1ecfe9489fb51e4869af15a13fc2cd',
-  content: 'User/Project@SHA: mojombo/god@be6a8cc1c1ecfe9489fb51e4869af15a13fc2cd2',
-}, {
-  isActive: false,
-  title: '#Num: #1',
-  content: 'User/#Num: mojombo#1',
-}, {
-  isActive: false,
-  title: 'User/Project#Num: mojombo/god#1',
-  content: 'These are dangerous goodies though, and we need to make sure email addresses don\'t get mangled:',
-}]
 
 export default {
   name: 'landing-page',
   components: { SystemInformation, codemirror },
+  beforeRouteEnter(to, from, next) {
+    store.dispatch('SET_ENTRIES')
+    next()
+  },
   created() {
     this.codeChange(this, this.code)
+  },
+  computed: {
+    entries() {
+      return this.$store.state.entry.entries
+    },
   },
   methods: {
     open(link) {
@@ -138,11 +89,8 @@ export default {
         this.keyBuffer = ''
       })
       editor.save = () => {
-        const content = editor.getValue().trim()
-        console.log(content)
+        const content = editor.getValue().trim() // eslint-disable-line
       }
-      // CodeMirror.Vim.defineMotion('quit', this.closeEditor)
-      // CodeMirror.Vim.mapCommand('ZQ', 'motion', 'quit')
     },
     onEditorCodeChange(code) {
       this.codeChange(this, code)
@@ -155,7 +103,6 @@ export default {
     return {
       transpiled: '',
       keyBuffer: '',
-      menus: sampleMenus,
       code: sample,
       editorOptions: {
         tabSize: 4,
