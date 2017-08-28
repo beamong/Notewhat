@@ -58,13 +58,11 @@ import 'codemirror/keymap/vim'
 
 import store from '../store'
 
-import SystemInformation from './LandingPage/SystemInformation'
-
 const sample = fs.readFileSync('./static/sample.md').toString()
 
 export default {
   name: 'landing-page',
-  components: { SystemInformation, codemirror },
+  components: { codemirror },
   beforeRouteEnter(to, from, next) {
     store.dispatch('SET_ENTRIES')
     next()
