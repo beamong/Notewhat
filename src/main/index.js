@@ -28,6 +28,17 @@ function createWindow() {
   mainWindow.on('closed', () => {
     mainWindow = null
   })
+
+  const wc = mainWindow.webContents
+
+  const shell = require('electron').shell // eslint-disable-line
+
+  wc.on('will-navigate', (e, url) => {
+    if (url !== wc.getURL()) {
+      e.preventDefault()
+      shell.openExternal(url)
+    }
+  })
 }
 
 app.on('ready', createWindow)

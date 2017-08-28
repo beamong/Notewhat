@@ -1,24 +1,132 @@
 <template>
   <div class="holygrail">
-    <header>
-      NoteWhat
-    </header>
+    <!-- <header>
+            NoteWhat
+          </header> -->
     <div class="holygrail-body">
       <main class="holygrail-content">
         <div class="editor">
           <codemirror :code="code" :options="editorOptions" @ready="onEditorReady" @change="onEditorCodeChange"></codemirror>
         </div>
         <div v-if="keyBuffer" class="keybuffer-placeholder">
-          Key buffer: <span style="">{{keyBuffer}}</span>
+          Key buffer:
+          <span style="">{{keyBuffer}}</span>
         </div>
       </main>
 
       <nav class="holygrail-nav">
-        nav
+        <div>
+          <h1>View the source of this content.</h1>
+          <div class="content">
+            Let's get the whole "linebreak" thing out of the way. The next paragraph contains two phrases separated by a single newline character:
+          </div>
+        </div>
+        <div class="active">
+          <h1>Roses are red Violets are blue</h1>
+          <div class="content">
+            The next paragraph has the same phrases, but now they are separated by two spaces and a newline character:
+          </div>
+        </div>
+        <div>
+          <h1>Roses are red</h1>
+          <div class="content">
+            Violets are blue
+          </div>
+        </div>
+        <div>
+          <h1>Oh, and one thing I cannot stand is the mangling of words with multiple underscores in them like perform_complicated_task or do_this_and_do_that_and_another_thing.</h1>
+          <div class="content">
+            A bit of the GitHub spice
+          </div>
+        </div>
+        <div>
+          <h1>In addition to the changes in the previous section, certain references are auto-linked:</h1>
+          <div class="content">
+            SHA: be6a8cc1c1ecfe9489fb51e4869af15a13fc2cd2
+          </div>
+        </div>
+        <div>
+          <h1>User@SHA ref: mojombo@be6a8cc1c1ecfe9489fb51e4869af15a13fc2cd2</h1>
+          <div class="content">
+            User/Project@SHA: mojombo/god@be6a8cc1c1ecfe9489fb51e4869af15a13fc2cd2
+          </div>
+        </div>
+        <div>
+          <h1>#Num: #1</h1>
+          <div class="content">
+            User/#Num: mojombo#1
+          </div>
+        </div>
+        <div>
+          <h1>User/Project#Num: mojombo/god#1</h1>
+          <div class="content">
+            These are dangerous goodies though, and we need to make sure email addresses don't get mangled:
+          </div>
+        </div>
+        <div>
+          <h1>한글제목</h1>
+          <div class="content">
+            no more content
+          </div>
+        </div>
+        <div>
+          <h1>View the source of this content.</h1>
+          <div class="content">
+            Let's get the whole "linebreak" thing out of the way. The next paragraph contains two phrases separated by a single newline character:
+          </div>
+        </div>
+        <div>
+          <h1>Roses are red Violets are blue</h1>
+          <div class="content">
+            The next paragraph has the same phrases, but now they are separated by two spaces and a newline character:
+          </div>
+        </div>
+        <div>
+          <h1>Roses are red</h1>
+          <div class="content">
+            Violets are blue
+          </div>
+        </div>
+        <div>
+          <h1>Oh, and one thing I cannot stand is the mangling of words with multiple underscores in them like perform_complicated_task or do_this_and_do_that_and_another_thing.</h1>
+          <div class="content">
+            A bit of the GitHub spice
+          </div>
+        </div>
+        <div>
+          <h1>In addition to the changes in the previous section, certain references are auto-linked:</h1>
+          <div class="content">
+            SHA: be6a8cc1c1ecfe9489fb51e4869af15a13fc2cd2
+          </div>
+        </div>
+        <div>
+          <h1>User@SHA ref: mojombo@be6a8cc1c1ecfe9489fb51e4869af15a13fc2cd2</h1>
+          <div class="content">
+            User/Project@SHA: mojombo/god@be6a8cc1c1ecfe9489fb51e4869af15a13fc2cd2
+          </div>
+        </div>
+        <div>
+          <h1>#Num: #1</h1>
+          <div class="content">
+            User/#Num: mojombo#1
+          </div>
+        </div>
+        <div>
+          <h1>User/Project#Num: mojombo/god#1</h1>
+          <div class="content">
+            These are dangerous goodies though, and we need to make sure email addresses don't get mangled:
+          </div>
+        </div>
+        <div>
+          <h1>한글제목</h1>
+          <div class="content">
+            no more content
+          </div>
+        </div>
       </nav>
 
-      <aside class="holygrail-ads">
-        <div v-html="transpiled"></div>
+      <aside class="holygrail-preview">
+        <div class="markdown-body" v-html="transpiled"></div>
       </aside>
     </div>
   </div>
@@ -78,7 +186,9 @@ export default {
         mode: 'text/x-markdown',
         lineNumbers: true,
         line: true,
+        // theme: 'elegant',
         keyMap: 'vim',
+        lineWrapping: true,
         foldGutter: true,
         styleSelectedText: true,
         highlightSelectionMatches: { showToken: /\w/, annotateScrollbar: true },
@@ -90,6 +200,7 @@ export default {
 
 <style lang="scss">
 @import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro');
+@import url('https://fonts.googleapis.com/css?family=Droid+Sans+Mono');
 
 * {
   box-sizing: border-box;
@@ -108,7 +219,25 @@ body {
 .CodeMirror,
 .CodeMirror-scroll {
   height: 100%;
-  max-width: 500px;
+  width: 100%;
+  // max-width: 500px;
+  opacity: 0.9;
+}
+
+.CodeMirror pre {
+  font-family: 'Droid Sans Mono', serif;
+  font-size: 0.7em;
+}
+
+.CodeMirror-gutters {
+  border-right: 1px solid #EFEFEF;
+  background-color: #fff;
+  white-space: nowrap;
+  padding-right: 5px;
+}
+
+.CodeMirror-linenumber {
+  font-size: 0.9em;
 }
 
 .holygrail {
@@ -125,6 +254,7 @@ body {
 .holygrail-content {
   flex: 1;
   position: relative;
+  border-left: 1px solid #EFEFEF;
   .keybuffer-placeholder {
     position: absolute;
     right: 0;
@@ -134,19 +264,41 @@ body {
 }
 
 .holygrail-nav {
-  /* 12em은 열의 너비입니다. */
-  flex: 0 0 12em;
-  overflow: auto;
-}
-
-.holygrail-ads {
-  flex: 1;
-  background-color: pink;
-  overflow: auto;
-}
-
-.holygrail-nav {
-  /* 좌측에 네비게이션을 놓습니다. */
+  /* 12em is width of the column */
   order: -1;
+  flex: 0 0 20em;
+  overflow: auto; // background: #f1f6f8;
+  font-size: 0.80em;
+  >div {
+    width: 20em;
+    border-bottom: 1px solid #EFEFEF;
+    color: #626f73;
+    padding: 10px;
+    &.active {
+      background: #fce28d;
+    }
+    h1,
+    .content {
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+    h1 {
+      font-size: 1em;
+      margin-bottom: 5px;
+      color: #525f63;
+      font-weight: bold;
+    }
+    .content {}
+  }
 }
+
+.holygrail-preview {
+  flex: 1;
+  overflow: auto;
+  padding: 10px;
+  border-left: 1px solid #efefef;
+}
+
+@import './markdown.css';
 </style>
