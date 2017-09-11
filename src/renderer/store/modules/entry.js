@@ -68,6 +68,13 @@ const mutations = {
   SET_ENTRIES(state, { entries }) {
     state.entries = entries
   },
+  ACTIVE_ENTRY(state, { entry }) {
+    state.entries.forEach((entry) => {
+      entry.isActive = false
+    })
+    entry.entry.isActive = true
+    state.entries[state.entries.indexOf(entry)] = entry
+  },
 }
 
 const actions = {
@@ -75,6 +82,11 @@ const actions = {
     // do something async
     commit('SET_ENTRIES', {
       entries: sampleEntries,
+    })
+  },
+  ACTIVE_ENTRY({ commit }, entry) {
+    commit('ACTIVE_ENTRY', {
+      entry,
     })
   },
 }
