@@ -69,11 +69,19 @@ const mutations = {
     state.entries = entries
   },
   ACTIVE_ENTRY(state, { entry }) {
-    state.entries.forEach((entry) => {
-      entry.isActive = false
+    const copiedEntries = state.entries.map((obj) => {
+      if (obj === entry) {
+        return {
+          ...entry,
+          isActive: true,
+        }
+      }
+      return {
+        ...obj,
+        isActive: false,
+      }
     })
-    entry.entry.isActive = true
-    state.entries[state.entries.indexOf(entry)] = entry
+    state.entries = copiedEntries
   },
 }
 
@@ -82,11 +90,6 @@ const actions = {
     // do something async
     commit('SET_ENTRIES', {
       entries: sampleEntries,
-    })
-  },
-  ACTIVE_ENTRY({ commit }, entry) {
-    commit('ACTIVE_ENTRY', {
-      entry,
     })
   },
 }

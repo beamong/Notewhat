@@ -92,7 +92,7 @@ export default {
     }, 1000),
     clickEntry(entry) {
       this.code = entry.content
-      store.dispatch('ACTIVE_ENTRY', {
+      store.commit('ACTIVE_ENTRY', {
         entry,
       })
     },
