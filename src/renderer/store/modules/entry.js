@@ -68,6 +68,21 @@ const mutations = {
   SET_ENTRIES(state, { entries }) {
     state.entries = entries
   },
+  ACTIVE_ENTRY(state, { entry }) {
+    const copiedEntries = state.entries.map((obj) => {
+      if (obj === entry) {
+        return {
+          ...entry,
+          isActive: true,
+        }
+      }
+      return {
+        ...obj,
+        isActive: false,
+      }
+    })
+    state.entries = copiedEntries
+  },
 }
 
 const actions = {

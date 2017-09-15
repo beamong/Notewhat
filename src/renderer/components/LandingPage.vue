@@ -20,7 +20,7 @@
     </div>
     <div class="container-body">
       <nav class="list">
-        <div :class="entry.isActive ? 'active' : ''" :key="entry.id" v-for="entry in entries">
+        <div :class="entry.isActive ? 'active' : ''" :key="entry.id" v-for="entry in entries" @click="clickEntry(entry)">
           <h1>{{entry.title}}</h1>
           <div class="content">
             {{entry.content}}
@@ -90,6 +90,12 @@ export default {
     codeChange: _.throttle((self, code) => {
       self.transpiled = marked(code)
     }, 1000),
+    clickEntry(entry) {
+      this.code = entry.content
+      store.commit('ACTIVE_ENTRY', {
+        entry,
+      })
+    },
   },
   data() {
     return {
@@ -214,6 +220,7 @@ body {
         border-bottom: 1px solid #EFEFEF;
         color: #626f73;
         padding: 10px;
+        cursor: pointer;
         &.active {
           background: #fce28d;
         }
