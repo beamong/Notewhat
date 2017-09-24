@@ -83,6 +83,9 @@ const mutations = {
     })
     state.entries = copiedEntries
   },
+  ADD_ENTRY(state, { entry }) {
+    state.entries.unshift(entry)
+  },
 }
 
 const actions = {
@@ -91,6 +94,15 @@ const actions = {
     commit('SET_ENTRIES', {
       entries: sampleEntries,
     })
+  },
+  ADD_ENTRY({ commit }) {
+    const newEntry = {
+      isActive: false,
+      title: 'New Title',
+      content: '# New Title\n * Some Content\n * Some Content',
+    }
+    commit('ADD_ENTRY', { entry: newEntry })
+    commit('ACTIVE_ENTRY', { entry: newEntry })
   },
 }
 

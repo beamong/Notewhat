@@ -8,9 +8,9 @@
         </span>
       </nav>
       <nav class="header-content">
-        <div class="buttons">
+        <button class="buttons" @click="addEntry">
           <i class="fa fa-plus"></i>
-        </div>
+        </button>
         <div class="search">
           <i class="fa fa-search"></i>
           &nbsp;
@@ -95,6 +95,10 @@ export default {
       store.commit('ACTIVE_ENTRY', {
         entry,
       })
+    },
+    addEntry() {
+      store.dispatch('ADD_ENTRY')
+      this.code = this.$store.state.entry.entries[0].content
     },
   },
   data() {
@@ -189,9 +193,10 @@ body {
       display: flex;
       .buttons {
         padding: 1.0em;
-        flex: 1;
-        display: flex;
-        align-items: center;
+        border: none;
+        background-color: transparent;
+        outline: none;
+        cursor: pointer;
       }
       .search {
         font-size: 1em;
