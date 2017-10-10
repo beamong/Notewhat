@@ -1,68 +1,12 @@
-const sampleEntries = [{
-  isActive: true,
-  title: 'Roses are red Violets are blue',
-  content: 'The next paragraph has the same phrases, but now they are separated by two spaces and a newline character:',
-}, {
-  isActive: false,
-  title: 'Roses are red',
-  content: 'Violets are blue',
-}, {
-  isActive: false,
-  title: 'Oh, and one thing I cannot stand is the mangling of words with multiple underscores in them like perform_complicated_task or do_this_and_do_that_and_another_thing.',
-  content: 'A bit of the GitHub spice',
-}, {
-  isActive: false,
-  title: 'A bit of the GitHub spice',
-  content: 'Violets are blue',
-}, {
-  isActive: false,
-  title: 'In addition to the changes in the previous section, certain references are auto-linked:',
-  content: 'SHA: be6a8cc1c1ecfe9489fb51e4869af15a13fc2cd2',
-}, {
-  isActive: false,
-  title: 'User@SHA ref: mojombo@be6a8cc1c1ecfe9489fb51e4869af15a13fc2cd',
-  content: 'User/Project@SHA: mojombo/god@be6a8cc1c1ecfe9489fb51e4869af15a13fc2cd2',
-}, {
-  isActive: false,
-  title: '#Num: #1',
-  content: 'User/#Num: mojombo#1',
-}, {
-  isActive: false,
-  title: 'User/Project#Num: mojombo/god#1',
-  content: 'These are dangerous goodies though, and we need to make sure email addresses don\'t get mangled:',
-}, {
-  isActive: false,
-  title: 'Roses are red',
-  content: 'Violets are blue',
-}, {
-  isActive: false,
-  title: 'Oh, and one thing I cannot stand is the mangling of words with multiple underscores in them like perform_complicated_task or do_this_and_do_that_and_another_thing.',
-  content: 'A bit of the GitHub spice',
-}, {
-  isActive: false,
-  title: 'A bit of the GitHub spice',
-  content: 'Violets are blue',
-}, {
-  isActive: false,
-  title: 'In addition to the changes in the previous section, certain references are auto-linked:',
-  content: 'SHA: be6a8cc1c1ecfe9489fb51e4869af15a13fc2cd2',
-}, {
-  isActive: false,
-  title: 'User@SHA ref: mojombo@be6a8cc1c1ecfe9489fb51e4869af15a13fc2cd',
-  content: 'User/Project@SHA: mojombo/god@be6a8cc1c1ecfe9489fb51e4869af15a13fc2cd2',
-}, {
-  isActive: false,
-  title: '#Num: #1',
-  content: 'User/#Num: mojombo#1',
-}, {
-  isActive: false,
-  title: 'User/Project#Num: mojombo/god#1',
-  content: 'These are dangerous goodies though, and we need to make sure email addresses don\'t get mangled:',
-}]
+import fs from 'fs'
+import Promise from 'bluebird'
+Promise.promisifyAll(fs)
 
 const state = {
   entries: [],
+  current: {},
 }
+const dirName = './notes'
 
 const mutations = {
   SET_ENTRIES(state, { entries }) {
@@ -71,10 +15,11 @@ const mutations = {
   ACTIVE_ENTRY(state, { entry }) {
     const copiedEntries = state.entries.map((obj) => {
       if (obj === entry) {
-        return {
+        state.current = {
           ...entry,
           isActive: true,
         }
+        return state.current
       }
       return {
         ...obj,
@@ -86,23 +31,83 @@ const mutations = {
   ADD_ENTRY(state, { entry }) {
     state.entries.unshift(entry)
   },
+  SAVE_ENTRY(state, { prev, current }) {
+    const copiedEntries = state.entries.map((obj) => {
+      if (obj === prev) {
+        return {
+          ...current,
+        }
+      }
+      return {
+        ...obj,
+      }
+    })
+    state.current = current
+    state.entries = copiedEntries
+  },
+}
+
+const checkExistDir = async (path) => {
+  try {
+    await fs.statAsync(path)
+    return true
+  } catch (e) {
+    return false
+  }
+}
+
+const readFileAsync = async (path, fileName) => {
+  const content = await fs.readFileAsync(`${path}/${fileName}`, 'utf8')
+  return {
+    fileName,
+    isActive: false,
+    title: content.substring(0, 20),
+    content,
+  }
 }
 
 const actions = {
-  SET_ENTRIES({ commit }) {
-    // do something async
+  async SET_ENTRIES({ commit }) {
+    if (!await checkExistDir(dirName)) {
+      fs.mkdirAsync(dirName, '0777').catch((err) => {
+        console.log(err)
+      })
+      return
+    }
+    const files = await fs.readdirAsync(dirName).catch((err) => {
+      console.log(err)
+    })
     commit('SET_ENTRIES', {
-      entries: sampleEntries,
+      entries: await Promise.all(
+        files
+          .filter(file => file.match(/\.txt/g) !== null)
+          .map(file => readFileAsync(dirName, file))),
     })
   },
   ADD_ENTRY({ commit }) {
     const newEntry = {
       isActive: false,
       title: 'New Title',
-      content: '# New Title\n * Some Content\n * Some Content',
+      content: '# New Title\n - Some Content\n - Some Content',
     }
     commit('ADD_ENTRY', { entry: newEntry })
     commit('ACTIVE_ENTRY', { entry: newEntry })
+  },
+  async SAVE_ENTRY({ commit }, { current, content }) {
+    const sep = '_'
+    const fileName = `${content.substring(0, 20).replace(/\s/g, sep) + sep + new Date().getTime()}.txt`
+    const path = `${dirName}/${fileName}`
+    fs.writeFileAsync(path, content)
+    commit('SAVE_ENTRY', {
+      prev: current,
+      current: {
+        isActive: true,
+        fileName,
+        title: content.substring(0, 20),
+        content,
+      },
+    })
+    fs.unlinkAsync(`${dirName}/${current.fileName}`)
   },
 }
 

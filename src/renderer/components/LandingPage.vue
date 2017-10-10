@@ -11,6 +11,9 @@
         <button class="buttons" @click="addEntry">
           <i class="fa fa-plus"></i>
         </button>
+        <button class="buttons" @click="saveEntry">
+          <i class="fa fa-save"></i>
+        </button>
         <div class="search">
           <i class="fa fa-search"></i>
           &nbsp;
@@ -28,11 +31,11 @@
         </div>
       </nav>
       <div class="note">
-        <codemirror :code="code" :options="editorOptions" @ready="onEditorReady" @change="onEditorCodeChange"></codemirror>
+        <codemirror v-model="content" :options="editorOptions" @ready="onEditorReady" @change="onEditorCodeChange"></codemirror>
         <!-- <div v-if="keyBuffer" class="keybuffer-placeholder">
-          Key buffer:
-          <span>{{keyBuffer}}</span>
-        </div> -->
+                    Key buffer:
+                    <span>{{keyBuffer}}</span>
+                  </div> -->
       </div>
       <div class="markdown">
         <div class="markdown-body" v-html="transpiled"></div>
@@ -62,11 +65,14 @@ export default {
     next()
   },
   created() {
-    this.codeChange(this, this.code)
+    this.codeChange(this, this.content)
   },
   computed: {
     entries() {
       return this.$store.state.entry.entries
+    },
+    current() {
+      return this.$store.state.entry.current
     },
   },
   methods: {
@@ -84,28 +90,34 @@ export default {
         const content = editor.getValue().trim() // eslint-disable-line
       }
     },
-    onEditorCodeChange(code) {
-      this.codeChange(this, code)
+    onEditorCodeChange(content) {
+      this.codeChange(this, content)
     },
-    codeChange: _.throttle((self, code) => {
-      self.transpiled = marked(code)
+    codeChange: _.throttle((self, content) => {
+      self.transpiled = marked(content)
     }, 1000),
     clickEntry(entry) {
-      this.code = entry.content
+      this.content = entry.content
       store.commit('ACTIVE_ENTRY', {
         entry,
       })
     },
     addEntry() {
       store.dispatch('ADD_ENTRY')
-      this.code = this.$store.state.entry.entries[0].content
+      this.content = this.$store.state.entry.entries[0].content
+    },
+    saveEntry() {
+      store.dispatch('SAVE_ENTRY', {
+        current: this.current,
+        content: this.content,
+      })
     },
   },
   data() {
     return {
       transpiled: '',
       keyBuffer: '',
-      code: sample,
+      content: sample,
       editorOptions: {
         tabSize: 4,
         mode: 'text/x-markdown',
@@ -141,7 +153,7 @@ body {
 
 .CodeMirror,
 .CodeMirror-scroll {
-  width: 100%; // max-width: 500px;
+  // width: 100%; // max-width: 500px;
   height: inherit;
   opacity: 0.9;
 }

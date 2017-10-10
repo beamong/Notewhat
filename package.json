@@ -57,6 +57,7 @@
   },
   "dependencies": {
     "axios": "^0.16.1",
+    "bluebird": "^3.5.1",
     "codemirror": "^5.29.0",
     "lodash": "^4.17.4",
     "marked": "^0.3.6",
